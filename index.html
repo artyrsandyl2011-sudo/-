@@ -35,6 +35,15 @@
     <button id="questsGameBtn">📝 Квести</button>
 </div>
 
+<!-- Прокачка -->
+<div id="upgradePanel" class="panel">
+    <h2>⬆ Прокачка</h2>
+    <p>Ваш рівень: <span id="upgradeLevel">1</span></p>
+    <p>Вартість прокачки: <span id="upgradeCost">200</span> монет</p>
+    <button id="doUpgradeBtn">Прокачати</button>
+    <p id="upgradeMessage"></p>
+</div>
+
 <!-- Колесо Фортуни -->
 <div id="wheelPanel" class="gamePanel panel">
     <h2>🎡 Колесо Фортуни</h2>
@@ -49,7 +58,7 @@
 
 <!-- Coin Flip -->
 <div id="coinFlipPanel" class="panel">
-    <h2> 💰 Монетка</h2>
+    <h2>🪙 Монетка</h2>
     <p>Ставка: <input type="number" id="coinBet" value="10" min="1"></p>
     <button id="headsBtn">Орёл 🦅</button>
     <button id="tailsBtn">Решка 🐍</button>
@@ -75,6 +84,7 @@
     <p>Виграш: <span id="sWins">0</span></p>
     <p>Програш: <span id="sLoss">0</span></p>
 </div>
+</div>
 
 <audio id="clickSound" src="./mp3/button-124476.mp3"></audio>
 <audio id="winSound" src="./mp3/video-game-bonus-323603.mp3"></audio>
@@ -83,3 +93,5 @@
 <script src="./index.js"></script>
 </body>
 </html>
+
+

@@ -6,6 +6,11 @@ let totalGames=0,totalWins=0,totalLosses=0;
 let rouletteGames=0, slotGames=0, diceGames=0, boxGames=0, bossGames=0;
 let achievements=[];
 
+const bgMusic = document.getElementById("bgMusic");
+bgMusic.volume = 0.3;
+document.addEventListener("click", () => { bgMusic.play(); }, {once:true});
+
+
 // UI
 const panels=document.querySelectorAll(".panel");
 const gamePanels=document.querySelectorAll(".gamePanel");

@@ -1,14 +1,102 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+<meta charset="UTF-8">
+<title>🌌 Космічне Казино</title>
+<link rel="stylesheet" href="./stule.css">
 </head>
 <body>
-    
 
+<canvas id="particles"></canvas>
 
-    <script src="./index.js"></script>
+<h1>🎰 Космічне Казино</h1>
+
+<!-- Фонова музика -->
+<audio id="bgMusic" src="./mp3/work_chilla_Muzyka_dlya_raboty_i_fona_-_Spokojnaya_muzyka_dlya_fonovogo_proslushivaniya_na_rabote_(SkySound.cc).mp3" loop autoplay></audio>
+
+<div class="top">
+    <div>💰 Баланс: <span id="balance">500</span></div>
+    <div>⚡ Рівень: <span id="level">1</span></div>
+</div>
+
+<div class="buttons">
+    <button id="menuBtn">🎮 Меню ігор</button>
+    <button id="statsBtn">📊 Статистика</button>
+    <button id="upgradeBtn">⬆ Прокачка</button>
+</div>
+
+<!-- Меню -->
+<div id="menu" class="panel">
+    <h2>🎮 Виберіть гру</h2>
+    <button id="rouletteGameBtn">🎡 Рулетка</button>
+    <button id="slotGameBtn">🎰 777 (lvl 2)</button>
+    <button id="diceGameBtn">🎲 Dice x2</button>
+    <button id="boxesGameBtn">📦 Три коробки</button>
+    <button id="bossGameBtn">👑 Бос (lvl 4)</button>
+</div>
+
+<!-- Панелі ігор -->
+<div id="roulettePanel" class="gamePanel panel">
+    <h3>🎡 Рулетка</h3>
+    <button id="redBtn">Червоний</button>
+    <button id="blackBtn">Чорний</button>
+    <button id="whiteBtn">Білий</button>
+</div>
+
+<div id="slotPanel" class="gamePanel panel">
+    <h3>🎰 Слот 777</h3>
+    <button id="spinSlotBtn">Крутити</button>
+    <div id="slotSymbols" class="slots"></div>
+</div>
+
+<div id="dicePanel" class="gamePanel panel">
+    <h3>🎲 Dice x2</h3>
+    <button id="rollDiceBtn">Кинути кості</button>
+    <div id="diceAnim"></div>
+</div>
+
+<div id="boxesPanel" class="gamePanel panel">
+    <h3>📦 Три коробки</h3>
+    <button id="box1Btn">1</button>
+    <button id="box2Btn">2</button>
+    <button id="box3Btn">3</button>
+</div>
+
+<div id="bossPanel" class="gamePanel panel">
+    <h3>👑 Бос</h3>
+    <p>Виберіть число 1-5</p>
+    <button id="boss1Btn">1</button>
+    <button id="boss2Btn">2</button>
+    <button id="boss3Btn">3</button>
+    <button id="boss4Btn">4</button>
+    <button id="boss5Btn">5</button>
+</div>
+
+<!-- Прокачка -->
+<div id="upgrade" class="panel">
+    <h2>⬆ Прокачка</h2>
+    <p>Ціна: <span id="upgradeCost">200</span></p>
+    <button id="upgradeBtnDo">Прокачати</button>
+</div>
+
+<!-- Статистика -->
+<div id="stats" class="panel">
+    <h2>📊 Статистика</h2>
+    <p>Ігор: <span id="sGames"></span></p>
+    <p>Виграш: <span id="sWins"></span></p>
+    <p>Програш: <span id="sLoss"></span></p>
+    <p>🎡 Рулетка: <span id="sRoulette"></span></p>
+    <p>🎰 777: <span id="sSlots"></span></p>
+    <p>🎲 Dice: <span id="sDice"></span></p>
+    <p>📦 Коробки: <span id="sBoxes"></span></p>
+    <p>👑 Бос: <span id="sBoss"></span></p>
+</div>
+
+<!-- Звуки -->
+<audio id="clickSound" src="./mp3/button-124476.mp3"></audio>
+<audio id="winSound" src="./mp3/video-game-bonus-323603.mp3"></audio>
+<audio id="loseSound" src="./mp3/falling-stone-326058.mp3"></audio>
+
+<script src="./index.js"></script>
 </body>
 </html>

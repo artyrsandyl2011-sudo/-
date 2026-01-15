@@ -1,213 +1,174 @@
-// -------------------------
-// Змінні
-// -------------------------
-let balance=500, level=1, win=20, upgradeCost=200;
-let totalGames=0,totalWins=0,totalLosses=0;
-let rouletteGames=0, slotGames=0, diceGames=0, boxGames=0, bossGames=0;
-let achievements=[];
+// Базові змінні
+let balance = 500;
+let totalWins = 0;
+let totalLosses = 0;
+let level = 1;
 
-const bgMusic = document.getElementById("bgMusic");
-bgMusic.volume = 0.3;
-document.addEventListener("click", () => { bgMusic.play(); }, {once:true});
-
-
-// UI
-const panels=document.querySelectorAll(".panel");
-const gamePanels=document.querySelectorAll(".gamePanel");
-const balanceSpan=document.getElementById("balance");
-const levelSpan=document.getElementById("level");
-const upgradeCostSpan=document.getElementById("upgradeCost");
+// Оновлення балансу
+function update(){
+    document.getElementById("balance").innerText = balance;
+    document.getElementById("level").innerText = level;
+}
 
 // Звуки
-const clickSound=document.getElementById("clickSound");
-const winSound=document.getElementById("winSound");
-const loseSound=document.getElementById("loseSound");
+const bgMusic = document.getElementById("bgMusic");
+const clickSound = document.getElementById("clickSound");
+const winSound = document.getElementById("winSound");
+const loseSound = document.getElementById("loseSound");
 function playSound(type){
     if(type==="click") clickSound.play();
     if(type==="win") winSound.play();
     if(type==="lose") loseSound.play();
 }
 
-// -------------------------
-// UI функції
-// -------------------------
-function hideAll(){ panels.forEach(p=>p.style.display="none"); gamePanels.forEach(p=>p.style.display="none"); }
+// Фонова музика старт після кліку
+document.addEventListener("click", ()=>{
+    bgMusic.play().catch(e=>console.log(e));
+},{once:true});
 
-function showPanel(id){ hideAll(); document.getElementById(id).style.display="block"; playSound("click"); }
-
-function update(){
-    balanceSpan.innerText=balance;
-    levelSpan.innerText=level;
-    upgradeCostSpan.innerText=upgradeCost;
-    document.getElementById("slotGameBtn").disabled=level<2;
-    document.getElementById("bossGameBtn").disabled=level<4 || balance<100000;
+// Показ панелі
+function showPanel(id){
+    document.querySelectorAll(".panel").forEach(p=>p.style.display="none");
+    document.getElementById(id).style.display="block";
 }
 
-// -------------------------
-// Меню кнопки
-// -------------------------
-document.getElementById("menuBtn").onclick=()=>showPanel("menu");
-document.getElementById("statsBtn").onclick=()=>showStats();
-document.getElementById("upgradeBtn").onclick=()=>showPanel("upgrade");
+// Меню
+document.getElementById("menuBtn").onclick = ()=>showPanel("menu");
+document.getElementById("statsBtn").onclick = ()=>showPanel("stats");
 
-// -------------------------
-// Кнопки ігор
-// -------------------------
-document.getElementById("rouletteGameBtn").onclick=()=>showPanel("roulettePanel");
-document.getElementById("slotGameBtn").onclick=()=>showPanel("slotPanel");
-document.getElementById("diceGameBtn").onclick=()=>showPanel("dicePanel");
-document.getElementById("boxesGameBtn").onclick=()=>showPanel("boxesPanel");
-document.getElementById("bossGameBtn").onclick=()=>showPanel("bossPanel");
+// Ігри
+document.getElementById("coinFlipGameBtn").onclick = ()=>showPanel("coinFlipPanel");
+document.getElementById("rouletteGameBtn").onclick = ()=>showPanel("wheelPanel");
+document.getElementById("questsGameBtn").onclick = ()=>showPanel("questsPanel");
 
-// -------------------------
-// Кнопки ігор
-// -------------------------
-document.getElementById("redBtn").onclick=()=>roulettePlay("червоний");
-document.getElementById("blackBtn").onclick=()=>roulettePlay("чорний");
-document.getElementById("whiteBtn").onclick=()=>roulettePlay("білий");
+// Coin Flip
+const coin = document.getElementById("coin");
+const coinBet = document.getElementById("coinBet");
+const coinMessage = document.getElementById("coinMessage");
+document.getElementById("headsBtn").onclick = ()=>flipCoin("Орёл");
+document.getElementById("tailsBtn").onclick = ()=>flipCoin("Решка");
 
-document.getElementById("spinSlotBtn").onclick=()=>slotGame();
-document.getElementById("rollDiceBtn").onclick=()=>diceGame();
-document.getElementById("box1Btn").onclick=()=>chooseBox(1);
-document.getElementById("box2Btn").onclick=()=>chooseBox(2);
-document.getElementById("box3Btn").onclick=()=>chooseBox(3);
-document.getElementById("boss1Btn").onclick=()=>bossChoice(1);
-document.getElementById("boss2Btn").onclick=()=>bossChoice(2);
-document.getElementById("boss3Btn").onclick=()=>bossChoice(3);
-document.getElementById("boss4Btn").onclick=()=>bossChoice(4);
-document.getElementById("boss5Btn").onclick=()=>bossChoice(5);
-document.getElementById("upgradeBtnDo").onclick=()=>upgrade();
+function flipCoin(choice){
+    let bet = parseInt(coinBet.value);
+    if(isNaN(bet)||bet<=0){coinMessage.innerText="Введіть коректну ставку!"; return;}
+    if(bet>balance){coinMessage.innerText="Недостатньо грошей!"; return;}
+    balance -= bet; update();
+    coin.classList.remove("coin-flip");
+    void coin.offsetWidth;
+    coin.classList.add("coin-flip");
+    setTimeout(()=>{
+        const result = Math.random()<0.5 ? "Орёл" : "Решка";
+        coin.innerText = result==="Орёл" ? "🦅" : "🐍";
+        if(choice===result){
+            let winAmount = bet*2; balance+=winAmount; totalWins+=winAmount;
+            coinMessage.innerText=`✅ Ви виграли ${winAmount} монет!`; coinMessage.className="winMessage";
+            playSound("win");
+        } else {
+            totalLosses+=bet;
+            coinMessage.innerText="❌ Програш!"; coinMessage.className="loseMessage";
+            playSound("lose");
+        }
+        update();
+    },2000);
+}
 
-// -------------------------
-// Частинки космосу
-// -------------------------
-const canvas=document.getElementById("particles");
-const ctx=canvas.getContext("2d");
-let parts=[];
-function resize(){ canvas.width=innerWidth; canvas.height=innerHeight; }
-resize(); window.addEventListener("resize",resize);
-for(let i=0;i<80;i++) parts.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*2+1,vx:(Math.random()-0.5)*0.4,vy:(Math.random()-0.5)*0.4,color:"white"});
-function animate(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    parts.forEach(p=>{
-        p.x+=p.vx; p.y+=p.vy;
-        if(p.x<0||p.x>canvas.width)p.vx*=-1;
-        if(p.y<0||p.y>canvas.height)p.vy*=-1;
-        ctx.beginPath(); ctx.fillStyle=p.color; ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+// Квести
+const quests = [
+    {question:"Який колір суміші синього та жовтого?", options:["Зелений","Фіолетовий","Помаранчевий"], answer:0},
+    {question:"Скільки днів у лютому у невисокосний рік?", options:["28","29","30"], answer:0},
+    {question:"Яка планета найближча до Сонця?", options:["Марс","Меркурій","Венера"], answer:1}
+];
+const questText = document.getElementById("questText");
+const questOptions = document.getElementById("questOptions");
+const questMessage = document.getElementById("questMessage");
+document.getElementById("newQuestBtn").onclick = generateQuest;
+function generateQuest(){
+    const q = quests[Math.floor(Math.random()*quests.length)];
+    questText.innerText = q.question;
+    questOptions.innerHTML="";
+    questMessage.innerText="";
+    q.options.forEach((opt,i)=>{
+        const btn=document.createElement("button");
+        btn.innerText = opt;
+        btn.onclick = ()=>{
+            if(i===q.answer){balance+=50; totalWins+=50; questMessage.innerText="✅ Правильно! +50 грошей"; questMessage.className="winMessage"; playSound("win");}
+            else{questMessage.innerText="❌ Неправильно!"; questMessage.className="loseMessage"; playSound("lose");}
+            update();
+        };
+        questOptions.appendChild(btn);
     });
+}
+
+// Колесо Фортуни
+const wheelCanvas = document.getElementById("wheelCanvas");
+const wheelCtx = wheelCanvas.getContext("2d");
+const wheelBet = document.getElementById("wheelBet");
+const spinWheelBtn = document.getElementById("spinWheelBtn");
+const wheelMessage = document.getElementById("wheelMessage");
+const sectors = [{color:"red",label:"Червоний"},{color:"black",label:"Чорний"},{color:"white",label:"Білий"}];
+let angle = 0; let spinning=false;
+
+function drawWheel(){
+    const ctx = wheelCtx; const radius = wheelCanvas.width/2;
+    ctx.clearRect(0,0,wheelCanvas.width,wheelCanvas.height);
+    const segAngle=(2*Math.PI)/sectors.length;
+    sectors.forEach((s,i)=>{
+        ctx.beginPath(); ctx.moveTo(radius,radius);
+        ctx.arc(radius,radius,radius,i*segAngle,(i+1)*segAngle);
+        ctx.fillStyle=s.color; ctx.fill(); ctx.stroke();
+        ctx.save(); ctx.translate(radius,radius);
+        ctx.rotate(i*segAngle+segAngle/2);
+        ctx.textAlign="right"; ctx.fillStyle="#fff"; ctx.font="16px Arial";
+        ctx.fillText(s.label,radius-10,5); ctx.restore();
+    });
+}
+drawWheel();
+
+function spinWheel(){
+    if(spinning) return;
+    let bet=parseInt(wheelBet.value);
+    if(isNaN(bet)||bet<=0){wheelMessage.innerText="Введіть коректну ставку!"; return;}
+    if(bet>balance){wheelMessage.innerText="Недостатньо грошей!"; return;}
+    balance-=bet; update();
+    spinning=true;
+    let duration=4000; let spins=Math.random()*4+4; let start=null;
+    function animate(time){
+        if(!start) start=time;
+        let progress=time-start; let t=Math.min(progress/duration,1);
+        let easeOut=1-Math.pow(1-t,3);
+        angle=easeOut*spins*2*Math.PI;
+        wheelCanvas.style.transform=`rotate(${angle}rad)`;
+        if(t<1) requestAnimationFrame(animate);
+        else{
+            spinning=false;
+            let segAngle=(2*Math.PI)/sectors.length;
+            let index=sectors.length-Math.floor((angle%(2*Math.PI))/segAngle)-1;
+            index=(index+sectors.length)%sectors.length;
+            let result=sectors[index].label;
+            if(result==="Червоний") winWheel(bet);
+            else loseWheel(bet);
+        }
+    }
     requestAnimationFrame(animate);
 }
-animate();
 
-// -------------------------
-// Вибух частинок при виграші
-// -------------------------
-function fireworks(color="gold"){
-    for(let i=0;i<40;i++){
-        parts.push({
-            x:Math.random()*canvas.width,
-            y:Math.random()*canvas.height,
-            r:2+Math.random()*2,
-            vx:(Math.random()-0.5)*6,
-            vy:(Math.random()-0.5)*6,
-            color:color
-        });
+function winWheel(bet){let winAmount=bet*2; balance+=winAmount; totalWins+=winAmount; wheelMessage.innerText=`✅ Виграш! ${winAmount} монет`; wheelMessage.className="winMessage"; playSound("win"); fireworks(); update();}
+function loseWheel(bet){totalLosses+=bet; wheelMessage.innerText="❌ Програш!"; wheelMessage.className="loseMessage"; playSound("lose"); update();}
+
+spinWheelBtn.onclick=spinWheel;
+
+// Функція частинок
+function fireworks(){
+    const canvas=document.getElementById("particles");
+    const ctx=canvas.getContext("2d");
+    canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+    for(let i=0;i<50;i++){
+        ctx.fillStyle=`hsl(${Math.random()*360},100%,50%)`;
+        ctx.beginPath();
+        ctx.arc(Math.random()*canvas.width, Math.random()*canvas.height, Math.random()*5+2,0,2*Math.PI);
+        ctx.fill();
     }
-    setTimeout(()=>parts.splice(80),1000);
 }
 
-// -------------------------
-// Гри
-// -------------------------
-function roulettePlay(c){
-    if(balance<10){ alert("Недостатньо грошей"); return;}
-    totalGames++; rouletteGames++; balance-=10;
-    let colors=["червоний","чорний","білий"];
-    let r=colors[Math.floor(Math.random()*3)];
-    if(c===r){ balance+=win; totalWins+=win; playSound("win"); fireworks(r==="червоний"?"red":r==="чорний"?"black":"white"); } 
-    else playSound("lose");
-    update();
-}
-
-function slotGame(){
-    if(balance<10){ alert("Недостатньо грошей"); return;}
-    totalGames++; slotGames++; balance-=10;
-    let s=["7️⃣","☠️","😼","⭐","💍"];
-    let a=s[Math.floor(Math.random()*5)];
-    let b=s[Math.floor(Math.random()*5)];
-    let c=s[Math.floor(Math.random()*5)];
-    document.getElementById("slotSymbols").innerHTML=`<span class="symbol">${a}</span><span class="symbol">${b}</span><span class="symbol">${c}</span>`;
-    let gain=0;
-    if(a===b && b===c){
-        if(a==="7️⃣") gain=2500;
-        if(a==="☠️") gain=-250;
-        if(a==="😼") gain=30;
-        if(a==="⭐") gain=100;
-        if(a==="💍") gain=300;
-        balance+=gain;
-        if(gain>0){ totalWins+=gain; playSound("win"); fireworks("gold"); } 
-        else { totalLosses+=Math.abs(gain); playSound("lose"); }
-    }
-    update();
-}
-
-function diceGame(){
-    if(balance<50){ alert("Недостатньо грошей"); return;}
-    totalGames++; diceGames++; balance-=50;
-    let a=Math.floor(Math.random()*6)+1;
-    let b=Math.floor(Math.random()*6)+1;
-    document.getElementById("diceAnim").innerText=`🎲 ${a}+${b}`;
-    if(a+b>=8){ balance+=100; totalWins+=100; playSound("win"); fireworks("cyan"); } 
-    else playSound("lose");
-    update();
-}
-
-function chooseBox(n){
-    if(balance<10){ alert("Недостатньо грошей"); return;}
-    totalGames++; boxGames++; balance-=10;
-    let winBox=Math.floor(Math.random()*3)+1;
-    if(n===winBox){ balance+=30; totalWins+=30; playSound("win"); fireworks("pink"); } 
-    else playSound("lose");
-    update();
-}
-
-function bossChoice(n){
-    if(balance<100000){ alert("Потрібно 100000"); return;}
-    totalGames++; bossGames++;
-    let r=Math.floor(Math.random()*5)+1;
-    if(n===r){ win=3000; alert("🔥 Новий рівень прокачки!"); playSound("win"); fireworks("gold"); } 
-    else { win=20; level=1; alert("💀 Програш"); playSound("lose"); }
-    update();
-}
-
-// -------------------------
-// Прокачка
-// -------------------------
-function upgrade(){
-    if(balance<upgradeCost){ alert("Недостатньо грошей"); return;}
-    balance-=upgradeCost; level++; win+=10; upgradeCost+=200;
-    playSound("win"); fireworks("lime");
-    update();
-}
-
-// -------------------------
-// Статистика
-// -------------------------
-function showStats(){
-    hideAll();
-    document.getElementById("stats").style.display="block";
-    document.getElementById("sGames").innerText=totalGames;
-    document.getElementById("sWins").innerText=totalWins;
-    document.getElementById("sLoss").innerText=totalLosses;
-    document.getElementById("sRoulette").innerText=rouletteGames;
-    document.getElementById("sSlots").innerText=slotGames;
-    document.getElementById("sDice").innerText=diceGames;
-    document.getElementById("sBoxes").innerText=boxGames;
-    document.getElementById("sBoss").innerText=bossGames;
-}
-
-// -------------------------
-// Старт
-// -------------------------
+// Ініціалізація
 update();
-showPanel("menu");

@@ -78,7 +78,7 @@ body{
     z-index:-1;
 }
 
-#coinMessage, #wheelMessage, #questMessage{
+#coinMessage, #wheelMessage, #questMessage, #upgradeMessage{
     font-size:18px;
     margin-top:10px;
 }

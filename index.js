@@ -1,16 +1,22 @@
+// -------------------
 // Базові змінні
+// -------------------
 let balance = 500;
 let totalWins = 0;
 let totalLosses = 0;
 let level = 1;
 
+// -------------------
 // Оновлення балансу
+// -------------------
 function update(){
     document.getElementById("balance").innerText = balance;
     document.getElementById("level").innerText = level;
 }
 
+// -------------------
 // Звуки
+// -------------------
 const bgMusic = document.getElementById("bgMusic");
 const clickSound = document.getElementById("clickSound");
 const winSound = document.getElementById("winSound");
@@ -21,27 +27,76 @@ function playSound(type){
     if(type==="lose") loseSound.play();
 }
 
-// Фонова музика старт після кліку
+// Фонова музика старт після першого кліку
 document.addEventListener("click", ()=>{
     bgMusic.play().catch(e=>console.log(e));
 },{once:true});
 
+// -------------------
 // Показ панелі
+// -------------------
 function showPanel(id){
     document.querySelectorAll(".panel").forEach(p=>p.style.display="none");
     document.getElementById(id).style.display="block";
 }
 
+// -------------------
 // Меню
+// -------------------
 document.getElementById("menuBtn").onclick = ()=>showPanel("menu");
 document.getElementById("statsBtn").onclick = ()=>showPanel("stats");
 
+// -------------------
+// Прокачка
+// -------------------
+const upgradeBtn = document.getElementById("upgradeBtn");
+const upgradePanel = document.getElementById("upgradePanel");
+const doUpgradeBtn = document.getElementById("doUpgradeBtn");
+const upgradeLevelSpan = document.getElementById("upgradeLevel");
+const upgradeCostSpan = document.getElementById("upgradeCost");
+const upgradeMessage = document.getElementById("upgradeMessage");
+
+let upgradeLevel = 1;
+let upgradeCost = 200;
+
+upgradeBtn.onclick = () => {
+    showPanel("upgradePanel");
+    updateUpgradePanel();
+};
+
+function updateUpgradePanel(){
+    upgradeLevelSpan.innerText = upgradeLevel;
+    upgradeCostSpan.innerText = upgradeCost;
+    upgradeMessage.innerText = "";
+}
+
+doUpgradeBtn.onclick = () => {
+    if(balance >= upgradeCost){
+        balance -= upgradeCost;
+        upgradeLevel++;
+        upgradeCost = Math.floor(upgradeCost * 1.5);
+        update();
+        updateUpgradePanel();
+        upgradeMessage.innerText = `✅ Прокачка успішна! Тепер рівень ${upgradeLevel}`;
+        upgradeMessage.className = "winMessage";
+        playSound("win");
+    } else {
+        upgradeMessage.innerText = "❌ Недостатньо грошей для прокачки!";
+        upgradeMessage.className = "loseMessage";
+        playSound("lose");
+    }
+};
+
+// -------------------
 // Ігри
+// -------------------
 document.getElementById("coinFlipGameBtn").onclick = ()=>showPanel("coinFlipPanel");
 document.getElementById("rouletteGameBtn").onclick = ()=>showPanel("wheelPanel");
 document.getElementById("questsGameBtn").onclick = ()=>showPanel("questsPanel");
 
+// -------------------
 // Coin Flip
+// -------------------
 const coin = document.getElementById("coin");
 const coinBet = document.getElementById("coinBet");
 const coinMessage = document.getElementById("coinMessage");
@@ -72,7 +127,9 @@ function flipCoin(choice){
     },2000);
 }
 
+// -------------------
 // Квести
+// -------------------
 const quests = [
     {question:"Який колір суміші синього та жовтого?", options:["Зелений","Фіолетовий","Помаранчевий"], answer:0},
     {question:"Скільки днів у лютому у невисокосний рік?", options:["28","29","30"], answer:0},
@@ -99,7 +156,9 @@ function generateQuest(){
     });
 }
 
+// -------------------
 // Колесо Фортуни
+// -------------------
 const wheelCanvas = document.getElementById("wheelCanvas");
 const wheelCtx = wheelCanvas.getContext("2d");
 const wheelBet = document.getElementById("wheelBet");
@@ -157,7 +216,9 @@ function loseWheel(bet){totalLosses+=bet; wheelMessage.innerText="❌ Прогр
 
 spinWheelBtn.onclick=spinWheel;
 
-// Функція частинок
+// -------------------
+// Частинки
+// -------------------
 function fireworks(){
     const canvas=document.getElementById("particles");
     const ctx=canvas.getContext("2d");
@@ -170,5 +231,7 @@ function fireworks(){
     }
 }
 
+// -------------------
 // Ініціалізація
+// -------------------
 update();
